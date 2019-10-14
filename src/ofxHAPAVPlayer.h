@@ -32,7 +32,7 @@ public:
     ofxHAPAVPlayer();
     virtual ~ofxHAPAVPlayer();
     
-    void load(string name);
+    void load(std::string name);
     void close();
     void update();
     
@@ -48,7 +48,7 @@ public:
     void stop();
     
     bool isFrameNew() const;
-    void setUsePixels(bool bUsePixels);
+    void setUsePixels(bool bUsePixels_);
     const ofPixels & getPixels() const;
     ofPixels & getPixels();
     ofTexture * getTexturePtr();
@@ -85,13 +85,14 @@ public:
     void nextFrame();
     void previousFrame();
     
-    string getMovieName();
-    string getMoviePath();
+    std::string getMovieName();
+    std::string getMoviePath();
     
 protected:
     
     bool bFrameNew;
     bool bNeedsShader;
+    bool bUsePixels;
     
     ofLoopType loopType;
     

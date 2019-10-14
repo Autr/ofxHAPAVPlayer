@@ -6,11 +6,12 @@
 //
 //
 
+#include "ofGLUtils.h"
 #include "ofxHAPAVPlayer.h"
 
 #define FourCCLog(n,f) NSLog(@"%@, %c%c%c%c",n,(int)((f>>24)&0xFF),(int)((f>>16)&0xFF),(int)((f>>8)&0xFF),(int)((f>>0)&0xFF))
 
-const string ofxHAPAVPlayerVertexShader = "varying vec4 color;\
+const std::string ofxHAPAVPlayerVertexShader = "varying vec4 color;\
 void main(void)\
 {\
 gl_Position = ftransform();\
@@ -18,7 +19,7 @@ color = gl_Color;\
 gl_TexCoord[0] = gl_MultiTexCoord0;\
 }";
 
-const string ofxHAPAVPlayerFragmentShader = "uniform sampler2D cocgsy_src;\
+const std::string ofxHAPAVPlayerFragmentShader = "uniform sampler2D cocgsy_src;\
 varying vec4 color;\
 const vec4 offsets = vec4(-0.50196078431373, -0.50196078431373, 0.0, 0.0);\
 void main()\
@@ -33,7 +34,7 @@ vec4 rgba = vec4(Y + Co - Cg, Y + Cg, Y - Co - Cg, 1.0) * color;\
 gl_FragColor = rgba;\
 }";
 
-const string ofxHAPAVPlayerPlusAFragmentShader = "uniform sampler2D cocgsy_src;\
+const std::string ofxHAPAVPlayerPlusAFragmentShader = "uniform sampler2D cocgsy_src;\
 uniform sampler2D alpha_src;\
 varying vec4 color;\
 const vec4 offsets = vec4(-0.50196078431373, -0.50196078431373, 0.0, 0.0);\
@@ -61,7 +62,7 @@ ofxHAPAVPlayer::~ofxHAPAVPlayer(){
 }
 
 //--------------------------------------------------------------
-void ofxHAPAVPlayer::load(string path){
+void ofxHAPAVPlayer::load(std::string path){
     
     @autoreleasepool {
         if(delegate == nil){
@@ -324,11 +325,20 @@ void ofxHAPAVPlayer::update(){
             
             CVImageBufferRef imageBuffer = [delegate getAVFDecodedFrame];
             
+            
             if(imageBuffer != nil){
                 
+                bFrameNew = true;
                 bNeedsShader = false;
                 
                 CVPixelBufferLockBaseAddress(imageBuffer, kCVPixelBufferLock_ReadOnly);
+                
+
+                if (bUsePixels) {
+                    unsigned char * raw = [delegate getPixels];
+                    pixels.setFromPixels( raw, getWidth(), getHeight(), OF_PIXELS_RGBA );
+                    pixels.swapRgb();
+                }
                 
                 if([delegate getWidth] != videoTextures[0].getWidth()
                    || [delegate getHeight] != videoTextures[0].getHeight()
@@ -452,20 +462,15 @@ bool ofxHAPAVPlayer::isFrameNew() const{
     return bFrameNew;
 }
 
-////--------------------------------------------------------------
-//void ofxHAPAVPlayer::setUsePixels(bool bUsePixels){
-//    
-//}
-//
-////--------------------------------------------------------------
-//const ofxHAPAVPlayer::ofPixels & getPixels() const{
-//    
-//}
-//
-////--------------------------------------------------------------
-//ofPixels & ofxHAPAVPlayer::getPixels(){
-//    
-//}
+//--------------------------------------------------------------
+void ofxHAPAVPlayer::setUsePixels(bool bUsePixels_){
+    bUsePixels = bUsePixels_;
+}
+
+//--------------------------------------------------------------
+ofPixels & ofxHAPAVPlayer::getPixels(){
+    return pixels;
+}
 
 //--------------------------------------------------------------
 ofTexture * ofxHAPAVPlayer::getTexturePtr(){
@@ -497,7 +502,7 @@ float ofxHAPAVPlayer::getHeight() const{
 //--------------------------------------------------------------
 bool ofxHAPAVPlayer::isPaused() const{
     if(delegate == nil) return true;
-    return [delegate getRate] == 0.0f;
+    return [delegate isPaused];
 }
 
 //--------------------------------------------------------------

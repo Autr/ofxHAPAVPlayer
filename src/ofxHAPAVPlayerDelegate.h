@@ -40,7 +40,7 @@ typedef enum{
     float _loadPosition;
     float _loadFrame;
     
-    float _rate;
+    float _rate, _previousRate;
     float _frameRate;
     
     int _currentFrame;
@@ -48,6 +48,7 @@ typedef enum{
     
     CMTime _duration;
     
+    BOOL _bIsPaused;
     BOOL _bLoaded;
     BOOL _bLoading;
     BOOL _bFrameNeedsRender;
@@ -93,7 +94,9 @@ typedef enum{
 
 - (CVImageBufferRef) getAVFDecodedFrame;
 - (HapDecoderFrame*) getHAPDecodedFrame;
+- (unsigned char *) getPixels;
 
+- (BOOL) isPaused;
 - (BOOL) isFrameReadyToRender;
 - (void) frameWasRendered;
 - (BOOL) isHAPEncoded;

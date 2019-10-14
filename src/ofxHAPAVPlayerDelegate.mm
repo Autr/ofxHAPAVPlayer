@@ -278,7 +278,6 @@ static void *ItemStatusContext = &ItemStatusContext;
     // dispatch the queue
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.asset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:kTracksKey] completionHandler:^{
-            
             double startTime = getTickCount();
             
             NSError * error = nil;
@@ -338,7 +337,8 @@ static void *ItemStatusContext = &ItemStatusContext;
             _videoHeight = [videoTrack naturalSize].height;
             _totalFrames = floor((float)CMTimeGetSeconds(_duration) * _frameRate);
             //_minFrameDuration = videoTrack.minFrameDuration;
-            _rate = 0.0; // reset rate to not autoplay
+            _rate = 1.0; // reset rate to not autoplay
+            _previousRate = 1.0;
             
             // extract codec subtype
             OSType fourcc;
@@ -541,7 +541,7 @@ static void *ItemStatusContext = &ItemStatusContext;
     if(!_bLoaded){
         if(_loadRate == INFINITY) _loadRate = 1.0f;
     }else{
-        [self.player setRate:_rate];
+        [self.player setRate: _rate];
     }
 }
 
@@ -550,9 +550,13 @@ static void *ItemStatusContext = &ItemStatusContext;
 }
 
 - (void) setPaused:(BOOL)bPaused{
-    if(bPaused){
-        [self.player setRate:0.0f];
+    _bIsPaused = bPaused;
+    if(_bIsPaused){
+        _previousRate = _rate;
+        _rate = 0.0f;
+        [self.player setRate:_rate];
     }else{
+        _rate = _previousRate;
         [self.player setRate:_rate];
     }
 }
@@ -584,7 +588,12 @@ static void *ItemStatusContext = &ItemStatusContext;
             _bSeeking = NO;
             _bFrameNeedsRender = NO;
             [asyncLock unlock];
+
             [self.player setRate:_rate];
+            if (_rate == 0.0f) {
+                _bFrameNeedsRender = TRUE;
+            }
+            
         }];
     }
     
@@ -764,6 +773,9 @@ static void *ItemStatusContext = &ItemStatusContext;
     
 }
 
+- (BOOL) isPaused{
+    return _bIsPaused;
+}
 - (BOOL) isFrameReadyToRender{
     return _bFrameNeedsRender;
 }
@@ -779,6 +791,29 @@ static void *ItemStatusContext = &ItemStatusContext;
 - (CVImageBufferRef) getAVFDecodedFrame{
     //_bFrameNeedsRender = NO;
     return _imageBuffer;
+}
+
+
+- (unsigned char *) getPixels{
+
+    CVPixelBufferLockBaseAddress( _imageBuffer, 0 );
+
+    //Processing here
+    int bufferWidth = (int)CVPixelBufferGetWidth(_imageBuffer);
+    int bufferHeight = (int)CVPixelBufferGetHeight(_imageBuffer);
+    unsigned char *pixel = (unsigned char *)CVPixelBufferGetBaseAddress(_imageBuffer);
+
+    //put buffer in open cv, no memory copied
+//    cv::Mat mat = cv::Mat(bufferHeight,bufferWidth,CV_8UC4,pixel,CVPixelBufferGetBytesPerRow(_imageBuffer));
+
+    //End processing
+    CVPixelBufferUnlockBaseAddress( _imageBuffer, 0 );
+
+//    cv::Mat matGray;
+//    cvtColor(mat, matGray, CV_BGR2GRAY);
+
+    return pixel;
+
 }
 
 - (HapDecoderFrame*) getHAPDecodedFrame{
