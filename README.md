@@ -1,5 +1,29 @@
 # ofxHAPAVPlayer
 
+MacOS only, OF 0.10.0 / 0.11.0
+
+## Fork Notes
+
+I forked this over [ofxHapPlayer](https://github.com/bangnoise/ofxHapPlayer) as it will handle other AVFoundation media types. The player is threaded, and the results much faster than the default ofVideoPlayer on MacOS, with real-time scrubbing of H264 encoded videos.
+
+As per the original README, I'm slowly adding in missing methods as I put it to use. For a _methodless_ implementation, using ofParameters to control playback, speed, timeline, check out [ofxFlex](https://github.com/Autr/ofxFlex).
+
+
+**XCode**
+
+The addon will work out-the-box with the latest project generator. To make the release app portable to other machines, you must link HapInAVFoundation.framework inside the build, by adding this line to the Build Phases > Run Script:
+
+```
+install_name_tool -change @rpath/HapInAVFoundation.framework/Versions/A/HapInAVFoundation @executable_path/../Frameworks/HapInAVFoundation.framework/Versions/A/HapInAVFoundation “$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME”;
+```
+
+**QT Creator**
+
+Currently `.mm` files must be added manually to the .qbs project file to use this addon. For a portable release version, it makes more sense to use XCode (script + code signing etc).
+
+
+## Original README
+
 A 64bit AVFoundation video player supporting the HAP codec in openFrameworks.
 
 Please note this is a work in progress. Most of the basic functionality of an ofVideoPlayer has been implemented, eg., getWidth, getHeight, play, pause, setFrame, getFrame etc but there are still some gaps - notably no getPixels and no set/getVolume.
