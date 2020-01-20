@@ -251,7 +251,7 @@ static void *ItemStatusContext = &ItemStatusContext;
     
 }
 
-- (void) load:(NSString *)path{
+- (bool) load:(NSString *)path{
 
     _bLoaded = NO;
     _bLoading = YES;

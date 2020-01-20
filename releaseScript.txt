@@ -1,0 +1,1 @@
+install_name_tool -change @rpath/HapInAVFoundation.framework/Versions/A/HapInAVFoundation @executable_path/../Frameworks/HapInAVFoundation.framework/Versions/A/HapInAVFoundation “$TARGET_BUILD_DIR/$PRODUCT_NAME.app/Contents/MacOS/$PRODUCT_NAME”;

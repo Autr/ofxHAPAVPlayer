@@ -157,3 +157,4 @@ ClientBin/
 *.xcuserstate
 *.xcuserdatad
 *.xccheckout
+*.xcodeproj

@@ -66,7 +66,7 @@ typedef enum{
 @property (strong, nonatomic) AVPlayerItemVideoOutput * nativeAVFOutput;
 @property (strong, nonatomic) AVPlayerItemHapDXTOutput * hapOutput;
 
-- (void) load:(NSString *)path;
+- (bool) load:(NSString *)path;
 
 - (void) play;
 - (void) stop;

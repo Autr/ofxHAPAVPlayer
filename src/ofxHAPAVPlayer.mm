@@ -337,7 +337,7 @@ void ofxHAPAVPlayer::update(){
                 if (bUsePixels) {
                     unsigned char * raw = [delegate getPixels];
                     pixels.setFromPixels( raw, getWidth(), getHeight(), OF_PIXELS_RGBA );
-                    pixels.swapRgb();
+//                    pixels.swapRgb();
                 }
                 
                 if([delegate getWidth] != videoTextures[0].getWidth()
