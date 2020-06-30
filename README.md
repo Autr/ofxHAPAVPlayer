@@ -2,13 +2,6 @@
 
 MacOS only, OF 0.10.0 / 0.11.0
 
-## Fork Notes
-
-I forked this over [ofxHapPlayer](https://github.com/bangnoise/ofxHapPlayer) as it will handle other AVFoundation media types. The player is threaded, and the results much faster than the default ofVideoPlayer on MacOS, with real-time scrubbing of H264 encoded videos.
-
-As per the original README, I'm slowly adding in missing methods as I put it to use. For a _methodless_ implementation, using ofParameters to control playback, speed, timeline, check out [ofxFlex](https://github.com/Autr/ofxFlex).
-
-
 **XCode**
 
 The addon will work out-the-box with the latest project generator. To make the release app portable to other machines, you must link HapInAVFoundation.framework inside the build, by adding this line to the Build Phases > Run Script:

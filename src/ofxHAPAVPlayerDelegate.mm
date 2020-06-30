@@ -571,10 +571,32 @@ static void *ItemStatusContext = &ItemStatusContext;
 }
 
 - (void)setPosition:(float)position {
-    
     if(!_bLoaded){
         _loadPosition = position;
     }else{
+        
+        __block AVPlayerItem * currentItem = self.playerItem;
+        AVPlayerItemStatus status = [currentItem status];
+        
+        BOOL debugStatus = YES;
+        
+        switch (status) {
+            case AVPlayerItemStatusUnknown: {
+                if (debugStatus) printf("[ofxHAPAVPlayerDelegate] AVPlayerItemStatusUnknown \n");
+                break;
+            }
+            case AVPlayerItemStatusReadyToPlay: {
+                if (debugStatus) printf("[ofxHAPAVPlayerDelegate] AVPlayerItemStatusReadyToPlay \n");
+                break;
+            }
+            case AVPlayerItemStatusFailed: {
+                if (debugStatus) printf("[ofxHAPAVPlayerDelegate] AVPlayerItemStatusFailed \n");
+                break;
+            }
+        }
+                
+        if (_bSeeking) return;
+        [self.player setRate:0.0f]; // super important
         _bSeeking = YES;
         CMTime time = CMTimeMakeWithSeconds(CMTimeGetSeconds(_duration) * position, NSEC_PER_SEC);
         time = CMTimeMaximum(time, kCMTimeZero);
@@ -582,17 +604,25 @@ static void *ItemStatusContext = &ItemStatusContext;
         [self.player seekToTime:time
                 toleranceBefore:kCMTimeZero
                  toleranceAfter:kCMTimeZero
-              completionHandler:^(BOOL finished)
-        {
-            [asyncLock lock];
-            _bSeeking = NO;
-            _bFrameNeedsRender = NO;
-            [asyncLock unlock];
+              completionHandler:^(BOOL finished) {
+                  
+            
+                  if (finished) {
+                      if (debugStatus) printf("[ofxHAPAVPlayerDelegate] seekToTime:SUCCESS \n");
+                    [asyncLock lock];
+                    _bSeeking = NO;
+                    _bFrameNeedsRender = NO;
+                    [asyncLock unlock];
 
-            [self.player setRate:_rate];
-            if (_rate == 0.0f) {
-                _bFrameNeedsRender = TRUE;
-            }
+                    [self.player setRate:_rate];
+                    if (_rate == 0.0f) _bFrameNeedsRender = TRUE;
+                  } else {
+                      if (debugStatus) printf("[ofxHAPAVPlayerDelegate] seekToTime:FAIL \n");
+                      [asyncLock lock];
+                      _bSeeking = YES;
+                      [asyncLock unlock];
+                      
+                  }
             
         }];
     }
