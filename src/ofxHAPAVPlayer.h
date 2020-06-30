@@ -90,9 +90,9 @@ public:
     
 protected:
     
-    bool bFrameNew;
-    bool bNeedsShader;
-    bool bUsePixels;
+    bool bFrameNew = false;
+    bool bNeedsShader = false;
+    bool bUsePixels = false;
     
     ofLoopType loopType;
     

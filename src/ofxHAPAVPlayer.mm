@@ -146,12 +146,17 @@ void ofxHAPAVPlayer::close(){
 //--------------------------------------------------------------
 void ofxHAPAVPlayer::update(){
     
+//    ofLog() << "AVF A" << ofGetTimestampString();
     if(delegate == nil) return;
     if(![delegate isLoaded]) return;
     
     bFrameNew = false;
     
+//    ofLog() << "AVF B" << ofGetTimestampString();
+    
     if([delegate isFrameReadyToRender]){
+        
+//        ofLog() << "AVF C" << ofGetTimestampString();
         
         if([delegate isHAPEncoded]){
             
@@ -330,6 +335,7 @@ void ofxHAPAVPlayer::update(){
                 
                 bFrameNew = true;
                 bNeedsShader = false;
+//                ofLog() << "AVF NEW" << ofGetTimestampString();
                 
                 CVPixelBufferLockBaseAddress(imageBuffer, kCVPixelBufferLock_ReadOnly);
                 
@@ -337,7 +343,6 @@ void ofxHAPAVPlayer::update(){
                 if (bUsePixels) {
                     unsigned char * raw = [delegate getPixels];
                     pixels.setFromPixels( raw, getWidth(), getHeight(), OF_PIXELS_RGBA );
-//                    pixels.swapRgb();
                 }
                 
                 if([delegate getWidth] != videoTextures[0].getWidth()
@@ -380,6 +385,9 @@ void ofxHAPAVPlayer::update(){
                 
                 //CVPixelBufferRelease(imageBuffer); // we do this in the CVDisplayLink renderCallback
                 
+            } else {
+                
+//                ofLog() << "AVF NONE" << ofGetTimestampString();
             }
             
             [delegate frameWasRendered];
@@ -469,6 +477,10 @@ void ofxHAPAVPlayer::setUsePixels(bool bUsePixels_){
 
 //--------------------------------------------------------------
 ofPixels & ofxHAPAVPlayer::getPixels(){
+    if (!bUsePixels) {
+        unsigned char * raw = [delegate getPixels];
+        pixels.setFromPixels( raw, getWidth(), getHeight(), OF_PIXELS_RGBA );
+    }
     return pixels;
 }
 

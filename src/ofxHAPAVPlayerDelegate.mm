@@ -554,6 +554,7 @@ static void *ItemStatusContext = &ItemStatusContext;
     if(_bIsPaused){
         _previousRate = _rate;
         _rate = 0.0f;
+        
         [self.player setRate:_rate];
     }else{
         _rate = _previousRate;
@@ -572,6 +573,7 @@ static void *ItemStatusContext = &ItemStatusContext;
 
 - (void)setPosition:(float)position {
     
+//    printf("AVF set position: %s", "SET POSITION");
     if(!_bLoaded){
         _loadPosition = position;
     }else{
@@ -591,6 +593,7 @@ static void *ItemStatusContext = &ItemStatusContext;
 
             [self.player setRate:_rate];
             if (_rate == 0.0f) {
+//                printf("AVF float: %f", _rate);
                 _bFrameNeedsRender = TRUE;
             }
             
@@ -761,8 +764,10 @@ static void *ItemStatusContext = &ItemStatusContext;
             if(_imageBuffer != nil) CVPixelBufferRelease(_imageBuffer);
             _imageBuffer = imageBuffer;
             if(_imageBuffer != nil){
+//                printf("DECODED: %s", "YES");
                 _bFrameNeedsRender = YES;
             }else{
+//                printf("DECODED: %s", "NO");
                 _bFrameNeedsRender = NO;
             }
             CVPixelBufferRelease(imageBuffer);
